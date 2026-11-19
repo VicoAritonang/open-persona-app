@@ -1,0 +1,24 @@
+[Unit]
+Description=OpenPersona platform API (streaming, gRPC, MCP, jobs)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=openpersona
+Group=openpersona
+EnvironmentFile=/etc/openpersona/openpersona.env
+ExecStart=/usr/local/bin/openpersona-cloud serve -addr 127.0.0.1:8080 -packs /var/cache/openpersona
+Restart=always
+RestartSec=2
+# A t3.small has 2 GB: keep the Go heap well inside it.
+Environment=GOMEMLIMIT=1200MiB
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+CacheDirectory=openpersona
+ReadWritePaths=/var/cache/openpersona
+
+[Install]
+WantedBy=multi-user.target

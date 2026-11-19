@@ -1,0 +1,82 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  OpenPersona hosted API on AWS Lambda: knowledge, chat, async jobs, pack
+  downloads and MCP behind a Function URL. One function serves HTTP and runs
+  async jobs (it invokes itself with InvocationType=Event). Streaming is
+  served by the EC2 deployment (deploy/aws/ec2). Build first: ./build.sh
+
+Parameters:
+  FunctionName:
+    Type: String
+    Default: openpersona-api
+  RegistryURL:
+    Type: String
+    NoEcho: true
+    Description: Neon connection string (the -pooler host is fine)
+  OpenAIKey:
+    Type: String
+    NoEcho: true
+    Description: For query embeddings (text-embedding-3-small) and openai:* chat models
+  OpenRouterKey:
+    Type: String
+    NoEcho: true
+    Default: ""
+  ChatModel:
+    Type: String
+    Default: openrouter:typesafe/jev-router
+  OperatorKey:
+    Type: String
+    NoEcho: true
+    Default: ""
+    Description: Optional key with every scope, next to the customer keys in the database
+  CorsOrigins:
+    Type: String
+    Default: ""
+    Description: Comma-separated browser origins for the frontend, e.g. https://app.example.com
+
+Globals:
+  Function:
+    Runtime: provided.al2023
+    Architectures: [arm64]
+    Handler: bootstrap
+
+Resources:
+  Api:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Ref FunctionName
+      CodeUri: build/
+      # 1024 MB buys a full vCPU share: faster pack open and retrieval.
+      MemorySize: 1024
+      # Jobs run up to OPENPERSONA_JOB_TIMEOUT inside the same function.
+      Timeout: 600
+      # Packs are cached in /tmp while the environment is warm (Kora is 14 MB).
+      EphemeralStorage:
+        Size: 2048
+      Environment:
+        Variables:
+          NEON_DB_URL: !Ref RegistryURL
+          OPENAI_API_KEY: !Ref OpenAIKey
+          OPENROUTER_API_KEY: !Ref OpenRouterKey
+          OPENPERSONA_CHAT_MODEL: !Ref ChatModel
+          OPENPERSONA_API_KEY: !Ref OperatorKey
+          OPENPERSONA_CORS_ORIGINS: !Ref CorsOrigins
+          OPENPERSONA_JOB_TIMEOUT: 9m
+      FunctionUrlConfig:
+        AuthType: NONE # API keys are checked by the application
+        InvokeMode: BUFFERED
+      EventInvokeConfig:
+        MaximumRetryAttempts: 1
+        MaximumEventAgeInSeconds: 3600
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: lambda:InvokeFunction
+              # The function's own ARN, built by name to avoid a circular reference.
+              Resource: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${FunctionName}
+
+Outputs:
+  ApiURL:
+    Description: Base URL for ClientOptions.BaseURL (or put CloudFront and your domain in front)
+    Value: !GetAtt ApiUrl.FunctionUrl
