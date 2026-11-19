@@ -1,0 +1,24 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Data and build output
+*.db
+*.db-wal
+*.db-shm
+*.persona
+/backend/deploy/aws/lambda/build/
+/backend/deploy/aws/ec2/openpersona-cloud
+
+# Web (once it exists)
+node_modules/
+.next/
+dist/
+
+# Editors and OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db

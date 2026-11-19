@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the OpenPersona platform. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [Semantic Versioning](https://semver.org).
+All notable changes to the OpenPersona App backend. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
@@ -11,7 +11,7 @@ All notable changes to the OpenPersona platform. The format follows [Keep a Chan
 
 ### Changed
 
-- Split out of the library into its own module, `github.com/VicoAritonang/open-persona-platform`, built against the library with a `replace` until it moves to its own repository.
+- Split out of the library into its own repository (this one, `backend/`), as the module `github.com/VicoAritonang/open-persona-app/backend`. It requires a published version of the library instead of building against a sibling directory.
 - `registry` moved here from `go.vicoworks.com/open-persona/registry`; it implements `server.Authenticator`, `server.JobStore` and `server.UsageRecorder` (the library's former `cloud` package). `registry.NewKey`, `HashKey` and `KeyPrefix` replace `cloud.NewKey`, `cloud.HashKey` and `cloud.KeyPrefix`.
 - EC2: the systemd unit runs `openpersona-cloud serve -packs ...`; Caddy proxies to it over h2c so gRPC works.
 

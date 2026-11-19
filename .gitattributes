@@ -1,0 +1,8 @@
+# Line endings: LF everywhere, on every platform (gofmt expects it).
+* text=auto eol=lf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+*.persona binary
+*.db binary
+*.png binary

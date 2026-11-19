@@ -1,6 +1,6 @@
 # The persona registry (Postgres / Neon)
 
-The platform stores every version of every pack in Postgres (Neon), so a pack can be distributed from a database as well as by copying the `.persona` file. The file format itself is described in the library's [docs/PACKS.md](../../docs/PACKS.md).
+The platform stores every version of every pack in Postgres (Neon), so a pack can be distributed from a database as well as by copying the `.persona` file. The file format itself is described in the library's [docs/PACKS.md](https://github.com/VicoAritonang/open-persona/blob/main/docs/PACKS.md).
 
 ### Setup
 

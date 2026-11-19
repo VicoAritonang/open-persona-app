@@ -50,7 +50,7 @@ import (
 	"go.vicoworks.com/open-persona/server"
 	"go.vicoworks.com/open-persona/server/rpc"
 
-	"github.com/VicoAritonang/open-persona-platform/registry"
+	"github.com/VicoAritonang/open-persona-app/backend/registry"
 )
 
 var version = "dev"

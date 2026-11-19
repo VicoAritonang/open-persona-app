@@ -1,37 +1,52 @@
-# OpenPersona Platform
+# OpenPersona App
 
-The hosted OpenPersona service: personas served to customers who hold an API key, on AWS Lambda and one EC2 instance, with packs, keys, jobs and usage in Postgres (Neon).
+The hosted OpenPersona platform: a web app where people train and build persona knowledge graphs, and the backend that trains them, stores them, and serves them to customers' products through API keys.
 
-It is built on the open-source library [`go.vicoworks.com/open-persona`](../README.md), which provides the engines, the HTTP/gRPC/MCP server and the API contract. This module adds only what the hosted service needs:
+It is built on the open-source library [OpenPersona](https://github.com/VicoAritonang/open-persona) (`go.vicoworks.com/open-persona`): the training and retrieval engines, the `.persona` pack format, and the HTTP/gRPC/MCP API with its versioned contract all come from there. This repository holds only what the hosted service adds.
 
-| Path | |
-|---|---|
-| `registry/` | Postgres (Neon) store: pack versions, API keys, async jobs, usage events; a `server.Catalog` that pulls packs on demand |
-| `cmd/openpersona-lambda/` | The API on AWS Lambda (HTTP, Connect RPC, and the async job worker) |
-| `cmd/openpersona-cloud/` | The always-on server for EC2 (streaming, native gRPC), and the operator CLI: registry, push/pull, API keys |
-| `deploy/aws/` | SAM template for Lambda; systemd unit, install script and Caddyfile for EC2 |
-| `docs/` | [HOSTING.md](docs/HOSTING.md) (architecture, deployment), [REGISTRY.md](docs/REGISTRY.md) (schema, commands) |
-
-## Develop
-
-```sh
-cd platform
-go test ./...
-go run ./cmd/openpersona-cloud registry status     # needs NEON_DB_URL in .env (see .env.example)
+```
+app/
+├── web/        the web app (frontend): build, train, evaluate and publish personas
+└── backend/    the backend (Go): registry, API keys, jobs, usage; runs on AWS Lambda + EC2 with Neon Postgres
 ```
 
-The registry tests run against Postgres only when `OPENPERSONA_TEST_REGISTRY_URL` is set; otherwise they are skipped.
+| Part | State | Docs |
+|---|---|---|
+| [`backend/`](backend) | Running: serves personas (knowledge, chat, streaming, async jobs, pack download, MCP, gRPC), the Neon registry, API keys, usage | [backend/README.md](backend/README.md), [HOSTING](backend/docs/HOSTING.md), [REGISTRY](backend/docs/REGISTRY.md) |
+| [`web/`](web) | Planned | [web/README.md](web/README.md) |
 
-## Relation to the library
+## How the parts fit
 
-Until this directory moves to its own repository, `go.mod` builds against the library in the parent directory (`replace go.vicoworks.com/open-persona => ../`), so a change to the library and the platform can land in one commit. To split it out:
+```
+ browser ──► web/ ──► backend/ "studio" API (planned): projects, sources, training jobs, eval, publish
+                         │
+                         ├── trains with the library's persona.Trainer, writes a .persona pack
+                         ├── stores every version in the registry (Neon)
+                         ▼
+ customers' products ──► backend/ serving API (running): HTTP, gRPC, MCP, with API keys
+```
 
-1. Copy `platform/` into the new repository (with `git subtree split --prefix=platform` to keep its history).
-2. Delete the `replace` line and `go get go.vicoworks.com/open-persona@<released version>`.
-3. Move `.github/workflows/platform.yml` there and drop its `platform/` path prefixes.
+The serving API is the library's contract (`/v1`, `openpersona.v1`), so customers can also run a downloaded pack locally with the library, unchanged.
 
-The platform depends only on the library's public API and its stable wire contract (`api/`), never on its internals.
+## Development
+
+Each part builds on its own:
+
+```sh
+cd backend && go test ./...
+```
+
+To change the library and the backend together, check both out side by side and add a Go workspace in the parent folder (not committed to either repository):
+
+```
+workspace/
+├── go.work        # go work init ./library ./app/backend
+├── library/       # github.com/VicoAritonang/open-persona
+└── app/           # this repository
+```
+
+With `go.work` present, the backend builds against the local library; CI and releases build against the version in `backend/go.mod`. Before releasing the backend, release the library and `go get go.vicoworks.com/open-persona@<version>` in `backend/`.
 
 ## Versioning
 
-Tagged `platform/vX.Y.Z` while it lives here (Go's convention for a module in a subdirectory), `vX.Y.Z` after the split. Changes are listed in [CHANGELOG.md](CHANGELOG.md).
+The parts are versioned independently: `backend/vX.Y.Z` tags (Go's convention for a module in a subdirectory) and the web app's own version once it exists. Each part keeps its own CHANGELOG.md.

@@ -1,6 +1,6 @@
 # Hosting OpenPersona
 
-The hosted platform serves personas to customers who hold an API key: knowledge, answers, async jobs, pack downloads, MCP and gRPC. Customers use it from Go with the library's client (`openpersona.NewClient`, see the library's [docs/CLIENT.md](../../docs/CLIENT.md)), or from any language over HTTP or gRPC (the contract is the library's [`api/`](../../api)).
+The hosted platform serves personas to customers who hold an API key: knowledge, answers, async jobs, pack downloads, MCP and gRPC. Customers use it from Go with the library's client (`openpersona.NewClient`, see the library's [docs/CLIENT.md](https://github.com/VicoAritonang/open-persona/blob/main/docs/CLIENT.md)), or from any language over HTTP or gRPC (the contract is the library's [`api/`](https://github.com/VicoAritonang/open-persona/tree/main/api)).
 
 ## The hosted service
 

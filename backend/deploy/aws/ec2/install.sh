@@ -1,6 +1,6 @@
 #!/bin/sh
 # Installs openpersona-cloud on an Amazon Linux 2023 or Ubuntu EC2 instance
-# (t3.small is enough). Build the binary on your machine first, from platform/:
+# (t3.small is enough). Build the binary on your machine first, from backend/:
 #   GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o deploy/aws/ec2/openpersona-cloud ./cmd/openpersona-cloud
 # copy it, this directory, and your env file to the instance, then run: sudo ./install.sh
 set -eu

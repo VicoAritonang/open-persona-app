@@ -1,4 +1,4 @@
-module github.com/VicoAritonang/open-persona-platform
+module github.com/VicoAritonang/open-persona-app/backend
 
 go 1.26.0
 
@@ -8,7 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.33.18
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.115.0
 	github.com/jackc/pgx/v5 v5.13.0
-	go.vicoworks.com/open-persona v0.0.0-00010101000000-000000000000
+	go.vicoworks.com/open-persona v0.1.2-0.20261119050303-28a8f4c58c20
 )
 
 require (
@@ -46,8 +46,3 @@ require (
 	modernc.org/memory v1.12.1 // indirect
 	modernc.org/sqlite v1.62.0 // indirect
 )
-
-// Until this platform moves to its own repository, it builds against the
-// library in the parent directory. After the split, drop this line and
-// require a released version (go get go.vicoworks.com/open-persona@v0.2.0).
-replace go.vicoworks.com/open-persona => ../
